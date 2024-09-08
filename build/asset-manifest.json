@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/splitwise-transactions/static/css/main.79d19d76.css",
+    "main.js": "/splitwise-transactions/static/js/main.b70ed105.js",
+    "static/js/453.b59cc489.chunk.js": "/splitwise-transactions/static/js/453.b59cc489.chunk.js",
+    "index.html": "/splitwise-transactions/index.html",
+    "main.79d19d76.css.map": "/splitwise-transactions/static/css/main.79d19d76.css.map",
+    "main.b70ed105.js.map": "/splitwise-transactions/static/js/main.b70ed105.js.map",
+    "453.b59cc489.chunk.js.map": "/splitwise-transactions/static/js/453.b59cc489.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.79d19d76.css",
+    "static/js/main.b70ed105.js"
+  ]
+}
