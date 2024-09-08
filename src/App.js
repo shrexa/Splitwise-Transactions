@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import AddTransaction from './components/AddTransaction';
 import TransactionList from './components/TransactionList';
 import BalanceSheet from './components/BalanceSheet';
+import DetailedBreakdown from './components/DetailedBreakdown';
+
 
 function App() {
   
@@ -21,6 +23,17 @@ function App() {
     Nistha: 0,
     Ankesh: 0,
   };
+  const transaction2 = [
+    { debtor: 'Alice', creditor: 'Bob', amount: 50 },
+    { debtor: 'Charlie', creditor: 'Alice', amount: 20 },
+  ];
+
+  // return (
+  //   <div className="App">
+  //     {/* Other components */}
+  //     <DetailedBreakdown transactions={transactions} />
+  //   </div>
+  // );
 
   return (
     <div className="App">
@@ -37,9 +50,12 @@ function App() {
         />
         <TransactionList transactions={transactions} />
         <BalanceSheet balances={balances} />
+        <DetailedBreakdown transaction2={transaction2}/>
       </main>
     </div>
   );
+
+  
 }
 
 export default App;
