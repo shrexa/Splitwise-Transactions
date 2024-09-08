@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { HashRouter as Router } from 'react-router-dom';
 import AddTransaction from './components/AddTransaction';
 import TransactionList from './components/TransactionList';
 import BalanceSheet from './components/BalanceSheet';
@@ -38,7 +39,7 @@ function App() {
   return (
     <div className="App">
       <header className="bg-primary text-white text-center py-4">
-        <h1>Splitwise Web App</h1>
+        <h1>Splitwise v Web App</h1>
       </header>
       <main className="container mt-4">
         {/* Passing state and setState to child components */}
