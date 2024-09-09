@@ -1,34 +1,70 @@
-
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-function BalanceSheet({ balances }) {
+function BalanceSheet({  balances }) {
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Balance Sheet</h2>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Person</th>
-            <th>Balance</th>
+            <br></br>
+            <br></br>
+
+    <h2 className="mb-4">Balance Sheet</h2>
+    <Table striped bordered hover>
+      <thead>
+        <tr>
+          <th>Person</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(balances).map(([person, balance]) => (
+          <tr key={person}>
+            <td>{person}</td>
+            <td className={balance >= 0 ? 'text-success' : 'text-danger'}>
+              ₹{balance.toFixed(2)}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {Object.entries(balances).map(([person, balance]) => (
-            <tr key={person}>
-              <td>{person}</td>
-              <td className={balance >= 0 ? 'text-success' : 'text-danger'}>
-                ₹{balance.toFixed(2)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+        ))}
+      </tbody>
+      <br></br>
+
+    </Table>
     </div>
   );
 }
+// export default class balances extends React.BalanceSheet{}
 
 export default BalanceSheet;
+
+// import React from 'react';
+// import { Table } from 'react-bootstrap';
+
+// function BalanceSheet({ balances }) {
+//   return (
+//     <div className="container mt-4">
+//       <h2 className="mb-4">Balance Sheet</h2>
+//       <Table striped bordered hover>
+//         <thead>
+//           <tr>
+//             <th>Person</th>
+//             <th>Balance</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {Object.entries(balances).map(([person, balance]) => (
+//             <tr key={person}>
+//               <td>{person}</td>
+//               <td className={balance >= 0 ? 'text-success' : 'text-danger'}>
+//                 ₹{balance.toFixed(2)}
+//               </td>
+//             </tr>
+//           ))}
+//         </tbody>
+//       </Table>
+//     </div>
+//   );
+// }
+
+// export default BalanceSheet;
 
 
 // import React from 'react';

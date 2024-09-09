@@ -3,23 +3,53 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
 
 
-function AddTransaction({ transactions, setTransactions }) {
+function AddTransaction({  transactions, setTransactions, newTransaction, setNewTransaction }) {
   const [payer, setPayer] = useState('');
   const [amount, setAmount] = useState('');
   const [participants, setParticipants] = useState([]);
   const [splitMode, setSplitMode] = useState('equal');
   const [customSplits, setCustomSplits] = useState({});
 
+  
   const handleAddTransaction = () => {
-    const newTransaction = {
-      payer,
-      amount: parseFloat(amount),
-      participants,
-      splitMode,
-      customSplits: splitMode === 'custom' ? customSplits : {},
-    };
-    setTransactions([...transactions, newTransaction]);
+    if (splitMode === 'equal') {
+      const splitAmount = amount / participants.length;
+      const customSplits = participants.reduce((acc, participant) => {
+        acc[participant] = splitAmount;
+        return acc;
+      }, {});
+      
+      const newTransaction = {
+        payer,
+        amount: parseFloat(amount),
+        participants,
+        splitMode: 'equal',
+        customSplits
+      };
+      setTransactions([...transactions, newTransaction]);
+    } else if (splitMode === 'custom') {
+      const totalSplit = Object.values(customSplits).reduce((sum, val) => sum + val, 0);
+      if (totalSplit !== 100) {
+        alert('The custom splits must add up to 100%');
+        return;
+      }
+  
+      const splitAmounts = participants.reduce((acc, participant) => {
+        acc[participant] = (customSplits[participant] / 100) * amount;
+        return acc;
+      }, {});
+  
+      const newTransaction = {
+        payer,
+        amount: parseFloat(amount),
+        participants,
+        splitMode: 'custom',
+        customSplits: splitAmounts
+      };
+      setTransactions([...transactions, newTransaction]);
+    }
   };
+  
 
   return (
     <div className="container mt-4">

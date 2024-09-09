@@ -1,16 +1,52 @@
-import React, { useState } from 'react';
-import { HashRouter as Router } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import AddTransaction from './components/AddTransaction';
 import TransactionList from './components/TransactionList';
 import BalanceSheet from './components/BalanceSheet';
 import DetailedBreakdown from './components/DetailedBreakdown';
 
-
 function App() {
-  
-  const [transactions, setTransactions] = useState([]);
+  // State to manage transactions with dummy data preloaded
+  const [transactions, setTransactions] = useState([
+    {
+      payer: 'Rajneesh',
+      amount: 1000,
+      participants: ['Rajneesh', 'Harsit', 'Nistha', 'Ankesh'],
+      splitMode: 'equal',
+      customSplits: {},
+    },
+    {
+      payer: 'Harsit',
+      amount: 500,
+      participants: ['Harsit', 'Nistha'],
+      splitMode: 'custom',
+      customSplits: { Harsit: 60, Nistha: 40 },
+    },
+    {
+      payer: 'Nistha',
+      amount: 800,
+      participants: ['Rajneesh', 'Nistha'],
+      splitMode: 'equal',
+      customSplits: {},
+    },
+    {
+      payer: 'Ankesh',
+      amount: 1200,
+      participants: ['Rajneesh', 'Harsit', 'Ankesh'],
+      splitMode: 'custom',
+      customSplits: { Rajneesh: 30, Harsit: 50, Ankesh: 20 },
+    },
+  ]);
 
-   const [newTransaction, setNewTransaction] = useState({
+  // State to manage balance sheet
+  const [balances, setBalances] = useState({
+    Rajneesh: 0,
+    Harsit: 0,
+    Nistha: 0,
+    Ankesh: 0,
+  });
+
+  // State for the new transaction form
+  const [newTransaction, setNewTransaction] = useState({
     payer: '',
     amount: 0,
     participants: [],
@@ -18,23 +54,72 @@ function App() {
     customSplits: {}, // for custom split logic
   });
 
-  const balances = {
-    Rajneesh: 0,
-    Harsit: 0,
-    Nistha: 0,
-    Ankesh: 0,
-  };
-  const transaction2 = [
-    { debtor: 'Alice', creditor: 'Bob', amount: 50 },
-    { debtor: 'Charlie', creditor: 'Alice', amount: 20 },
-  ];
+  // Calculate balances whenever transactions change
+  useEffect(() => {
+    const newBalances = {
+      Rajneesh: 0,
+      Harsit: 0,
+      Nistha: 0,
+      Ankesh: 0,
+    };
 
-  // return (
-  //   <div className="App">
-  //     {/* Other components */}
-  //     <DetailedBreakdown transactions={transactions} />
-  //   </div>
-  // );
+    transactions.forEach((transaction) => {
+      const totalAmount = transaction.amount;
+
+      if (transaction.splitMode === 'equal') {
+        const equalSplit = totalAmount / transaction.participants.length;
+        transaction.participants.forEach((participant) => {
+          if (participant !== transaction.payer) {
+            newBalances[participant] -= equalSplit;
+            newBalances[transaction.payer] += equalSplit;
+          }
+        });
+      } else if (transaction.splitMode === 'custom') {
+        Object.entries(transaction.customSplits).forEach(([participant, percentage]) => {
+          const splitAmount = (totalAmount * percentage) / 100;
+          if (participant !== transaction.payer) {
+            newBalances[participant] -= splitAmount;
+            newBalances[transaction.payer] += splitAmount;
+          }
+        });
+      }
+    });
+
+    setBalances(newBalances);
+  }, [transactions]);
+
+  // Calculate balances function for display
+  const calculateBalances = () => {
+    const newBalances = {
+      Rajneesh: 0,
+      Harsit: 0,
+      Nistha: 0,
+      Ankesh: 0,
+    };
+
+    transactions.forEach((transaction) => {
+      const totalAmount = transaction.amount;
+      if (transaction.splitMode === 'equal') {
+        const equalSplit = totalAmount / transaction.participants.length;
+        transaction.participants.forEach((participant) => {
+          if (participant !== transaction.payer) {
+            newBalances[participant] -= equalSplit;
+            newBalances[transaction.payer] += equalSplit;
+          }
+        });
+      } else if (transaction.splitMode === 'custom') {
+        Object.entries(transaction.customSplits).forEach(([participant, percentage]) => {
+          const splitAmount = (totalAmount * percentage) / 100;
+          if (participant !== transaction.payer) {
+            newBalances[participant] -= splitAmount;
+            newBalances[transaction.payer] += splitAmount;
+          }
+        });
+      }
+    });
+
+    return newBalances;
+  };
 
   return (
     <div className="App">
@@ -50,63 +135,11 @@ function App() {
           setNewTransaction={setNewTransaction}
         />
         <TransactionList transactions={transactions} />
-        <BalanceSheet balances={balances} />
-        <DetailedBreakdown transaction2={transaction2}/>
+        <BalanceSheet balances={calculateBalances()} />
+        <DetailedBreakdown transactions={transactions} />
       </main>
     </div>
   );
-
-  
 }
 
 export default App;
-
-// import React from 'react';
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// // import Home from './components/Home';
-// import About from './components/About';
-// import NotFound from './components/NotFound';
-// import AddTransaction from './components/AddTransaction';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import TransactionList from './components/TransactionList';
-
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<AddTransaction />} />
-//         {/* <Route path="/" element={<TransactionList />} /> */}
-//         {/* <Route path="/TransactionList" element={<TransactionList />} /> */}
-//         {/* <Route path="*" element={<NotFound />} /> */}
-//       </Routes>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
-// import React from 'react';
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// // import Home from './components/Home';
-// import About from './components/About';
-// import NotFound from './components/NotFound';
-// import AddTransaction from './components/AddTransaction';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import TransactionList from './components/TransactionList';
-
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<AddTransaction />} />
-//         {/* <Route path="/" element={<TransactionList />} /> */}
-//         {/* <Route path="/TransactionList" element={<TransactionList />} /> */}
-//         {/* <Route path="*" element={<NotFound />} /> */}
-//       </Routes>
-//     </Router>
-//   );
-// };
-
-// export default App;

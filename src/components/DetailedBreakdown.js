@@ -6,9 +6,13 @@ const renderTooltip = (props) => (
   </Tooltip>
 );
 
-const DetailedBreakdown = ({ transaction2 }) => {
+const DetailedBreakdown = ({ transactions }) => {
   return (
     <div className="detailed-breakdown">
+            <br></br>
+            <br></br>
+            <br></br>
+
       <h3>Who Owes Whom</h3>
       <table>
         <thead>
@@ -19,7 +23,7 @@ const DetailedBreakdown = ({ transaction2 }) => {
           </tr>
         </thead>
         <tbody>
-          {transaction2.map((transaction, index) => (
+          {transactions.map((transaction, index) => (
             <tr key={index}>
               <td>{transaction.debtor}</td>
               <td>
@@ -32,10 +36,16 @@ const DetailedBreakdown = ({ transaction2 }) => {
                 </OverlayTrigger>
               </td>
               <td>Rs {transaction.amount}</td>
+              {/* <p>{transaction.payer} paid ₹{transaction.amount}</p>
+              <p>Involved: {transaction.participants.join(', ')}</p> */}
             </tr>
           ))}
         </tbody>
       </table>
+      <br></br>
+      <br></br>
+      <br></br>
+
     </div>
   );
 };
