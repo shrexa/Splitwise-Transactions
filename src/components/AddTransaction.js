@@ -2,16 +2,51 @@ import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
 
-
-function AddTransaction({  transactions, setTransactions, newTransaction, setNewTransaction }) {
-  const [payer, setPayer] = useState('');
-  const [amount, setAmount] = useState('');
-  const [participants, setParticipants] = useState([]);
-  const [splitMode, setSplitMode] = useState('equal');
+function AddTransaction({ transactions, setTransactions, newTransaction, setNewTransaction }) {
+  const [error, setError] = useState('');
   const [customSplits, setCustomSplits] = useState({});
 
-  
+  const allowedPayers = ['Rajneesh', 'Harsit', 'Ankesh', 'Nistha'];
+
+  // Handle input changes to update newTransaction
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewTransaction((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Clear error message when user starts typing
+    if (error && name === 'payer') {
+      setError('');
+    }
+  };
+
+  const handleParticipantsChange = (e) => {
+    const participants = [...e.target.selectedOptions].map((o) => o.value);
+    setNewTransaction((prev) => ({
+      ...prev,
+      participants,
+    }));
+  };
+
+  const handleCustomSplitsChange = (e, participant) => {
+    const value = parseFloat(e.target.value);
+    setCustomSplits((prev) => ({
+      ...prev,
+      [participant]: value,
+    }));
+  };
+
   const handleAddTransaction = () => {
+    const { payer, amount, participants } = newTransaction;
+
+    // Validate payer
+    if (!allowedPayers.includes(payer)) {
+      setError(`Invalid payer name. Allowed names are: ${allowedPayers.join(', ')}`);
+      return;
+    }
+
     if (splitMode === 'equal') {
       const splitAmount = amount / participants.length;
       const customSplits = participants.reduce((acc, participant) => {
@@ -19,37 +54,36 @@ function AddTransaction({  transactions, setTransactions, newTransaction, setNew
         return acc;
       }, {});
       
-      const newTransaction = {
-        payer,
+      const newTransactionData = {
+        ...newTransaction,
         amount: parseFloat(amount),
-        participants,
         splitMode: 'equal',
         customSplits
       };
-      setTransactions([...transactions, newTransaction]);
+      setTransactions([...transactions, newTransactionData]);
     } else if (splitMode === 'custom') {
       const totalSplit = Object.values(customSplits).reduce((sum, val) => sum + val, 0);
       if (totalSplit !== 100) {
         alert('The custom splits must add up to 100%');
         return;
       }
-  
+
       const splitAmounts = participants.reduce((acc, participant) => {
         acc[participant] = (customSplits[participant] / 100) * amount;
         return acc;
       }, {});
-  
-      const newTransaction = {
-        payer,
+
+      const newTransactionData = {
+        ...newTransaction,
         amount: parseFloat(amount),
-        participants,
         splitMode: 'custom',
         customSplits: splitAmounts
       };
-      setTransactions([...transactions, newTransaction]);
+      setTransactions([...transactions, newTransactionData]);
     }
   };
-  
+
+  const { payer, amount, splitMode = 'equal', participants = [] } = newTransaction;
 
   return (
     <div className="container mt-4">
@@ -61,20 +95,24 @@ function AddTransaction({  transactions, setTransactions, newTransaction, setNew
             <Form.Control
               type="text"
               placeholder="Enter payer's name"
+              name="payer"
               value={payer}
-              onChange={(e) => setPayer(e.target.value)}
+              onChange={handleInputChange}
+              className={error ? 'is-invalid' : ''}
             />
+            {error && <div className="text-danger">{error}</div>}
           </Form.Group>
 
           <Form.Group as={Col} controlId="formAmount">
             <Form.Label>Amount</Form.Label>
             <InputGroup>
-              <InputGroup.Text>₹</InputGroup.Text>
+              <InputGroup.Text>₹ </InputGroup.Text>
               <Form.Control
                 type="number"
                 placeholder="Amount"
+                name="amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={handleInputChange}
               />
             </InputGroup>
           </Form.Group>
@@ -85,9 +123,8 @@ function AddTransaction({  transactions, setTransactions, newTransaction, setNew
           <Form.Control
             as="select"
             multiple
-            onChange={(e) =>
-              setParticipants([...e.target.selectedOptions].map((o) => o.value))
-            }
+            onChange={handleParticipantsChange}
+            value={participants}
           >
             <option value="Rajneesh">Rajneesh</option>
             <option value="Harsit">Harsit</option>
@@ -104,7 +141,7 @@ function AddTransaction({  transactions, setTransactions, newTransaction, setNew
             name="splitMode"
             value="equal"
             checked={splitMode === 'equal'}
-            onChange={(e) => setSplitMode(e.target.value)}
+            onChange={handleInputChange}
           />
           <Form.Check
             type="radio"
@@ -112,28 +149,22 @@ function AddTransaction({  transactions, setTransactions, newTransaction, setNew
             name="splitMode"
             value="custom"
             checked={splitMode === 'custom'}
-            onChange={(e) => setSplitMode(e.target.value)}
+            onChange={handleInputChange}
           />
         </Form.Group>
 
         {splitMode === 'custom' && (
           <Form.Group controlId="formCustomSplits" className="mb-3">
             <Form.Label>Custom Splits</Form.Label>
-            {/* Input for each participant's custom split percentage */}
             <Row>
-              {['Rajneesh', 'Harsit', 'Nistha', 'Ankesh'].map((participant) => (
+              {participants.map((participant) => (
                 <Col key={participant}>
                   <Form.Label>{participant}</Form.Label>
                   <InputGroup>
                     <Form.Control
                       type="number"
                       placeholder="Percentage"
-                      onChange={(e) =>
-                        setCustomSplits({
-                          ...customSplits,
-                          [participant]: parseFloat(e.target.value),
-                        })
-                      }
+                      onChange={(e) => handleCustomSplitsChange(e, participant)}
                     />
                     <InputGroup.Text>%</InputGroup.Text>
                   </InputGroup>

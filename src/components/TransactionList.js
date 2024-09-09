@@ -56,7 +56,7 @@ const TransactionList = ({ transactions }) => {
         {transactions.map((transaction, index) => (
           <tr key={index}>
             <td>{transaction.payer}</td>
-            <td>Rs{transaction.amount}</td>
+            <td>Rs&nbsp;{transaction.amount}</td>
             <td>
               {transaction.participants.join(', ')}
             </td>
