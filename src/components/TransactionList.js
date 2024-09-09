@@ -1,8 +1,11 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Card, ListGroup } from 'react-bootstrap';
+// import { Card, ListGroup } from 'react-bootstrap';
 
-function TransactionList({ transactions }) {
+
+const TransactionList = ({ transactions }) => {
+  console.log('Transactions in TransactionList:', transactions);
+// function TransactionList({ transactions }) {
   return (
     // <div className="container mt-4">
     //   <h2 className="mb-4">Transaction List</h2>
@@ -53,7 +56,7 @@ function TransactionList({ transactions }) {
         {transactions.map((transaction, index) => (
           <tr key={index}>
             <td>{transaction.payer}</td>
-            <td>${transaction.amount}</td>
+            <td>Rs{transaction.amount}</td>
             <td>
               {transaction.participants.join(', ')}
             </td>

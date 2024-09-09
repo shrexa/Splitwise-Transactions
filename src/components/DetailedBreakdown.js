@@ -1,3 +1,6 @@
+import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Card, ListGroup } from 'react-bootstrap';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const renderTooltip = (props) => (
@@ -18,21 +21,21 @@ const DetailedBreakdown = ({ transactions }) => {
         <thead>
           <tr>
             <th>Debtor</th>
-            <th>Creditor</th>
-            <th>Amount</th>
+            <th>Creditors after split</th>
+            <th>Amount to be split</th>
           </tr>
         </thead>
         <tbody>
           {transactions.map((transaction, index) => (
             <tr key={index}>
-              <td>{transaction.debtor}</td>
+              <td>{transaction.payer} &nbsp; &nbsp;</td>
               <td>
                 <OverlayTrigger
                   placement="top"
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderTooltip}
                 >
-                  <span>{transaction.creditor}</span>
+                  <span>{transaction.participants.join(', ')} &nbsp; &nbsp;</span>
                 </OverlayTrigger>
               </td>
               <td>Rs {transaction.amount}</td>
