@@ -1,7 +1,7 @@
 {
   "name": "splitwise-transactions",
   "version": "0.1.0",
-  "homepage": "https://shrexa.github.io/Splitwise-Transactions",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
