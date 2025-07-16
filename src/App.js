@@ -5,7 +5,7 @@ import BalanceSheet from './components/BalanceSheet';
 import DetailedBreakdown from './components/DetailedBreakdown';
 
 function App() {
-  // State to manage transactions with dummy data preloaded
+  // Initial transactions with description and date
   const [transactions, setTransactions] = useState([
     {
       payer: 'Rajneesh',
@@ -13,6 +13,8 @@ function App() {
       participants: ['Rajneesh', 'Harsit', 'Nistha', 'Ankesh'],
       splitMode: 'equal',
       customSplits: {},
+      description: 'Dinner at cafe',
+      date: '2025-07-14',
     },
     {
       payer: 'Harsit',
@@ -20,6 +22,8 @@ function App() {
       participants: ['Harsit', 'Nistha'],
       splitMode: 'custom',
       customSplits: { Harsit: 60, Nistha: 40 },
+      description: 'Snacks & Tea',
+      date: '2025-07-15',
     },
     {
       payer: 'Nistha',
@@ -27,6 +31,8 @@ function App() {
       participants: ['Rajneesh', 'Nistha'],
       splitMode: 'equal',
       customSplits: {},
+      description: 'Auto Fare',
+      date: '2025-07-15',
     },
     {
       payer: 'Ankesh',
@@ -34,85 +40,48 @@ function App() {
       participants: ['Rajneesh', 'Harsit', 'Ankesh'],
       splitMode: 'custom',
       customSplits: { Rajneesh: 30, Harsit: 50, Ankesh: 20 },
+      description: 'Lunch bill',
+      date: '2025-07-16',
     },
   ]);
 
-  // State to manage balance sheet
-  const [balances, setBalances] = useState({
-    Rajneesh: 0,
-    Harsit: 0,
-    Nistha: 0,
-    Ankesh: 0,
-  });
+  // Default list of users — can make dynamic later
+  const members = ['Rajneesh', 'Harsit', 'Nistha', 'Ankesh'];
 
-  // State for the new transaction form
+  const [balances, setBalances] = useState({});
+
   const [newTransaction, setNewTransaction] = useState({
     payer: '',
     amount: 0,
     participants: [],
-    splitMode: 'equal', // default to equal split
-    customSplits: {}, // for custom split logic
+    splitMode: 'equal',
+    customSplits: {},
+    description: '',
+    date: '',
   });
 
-  // Calculate balances whenever transactions change
-  useEffect(() => {
-    const newBalances = {
-      Rajneesh: 0,
-      Harsit: 0,
-      Nistha: 0,
-      Ankesh: 0,
-    };
+  // Reusable balance calculator
+  const calculateBalances = (txns) => {
+    const newBalances = {};
+    members.forEach((name) => (newBalances[name] = 0));
 
-    transactions.forEach((transaction) => {
-      const totalAmount = transaction.amount;
+    txns.forEach((transaction) => {
+      const { payer, amount, participants, splitMode, customSplits } = transaction;
 
-      if (transaction.splitMode === 'equal') {
-        const equalSplit = totalAmount / transaction.participants.length;
-        transaction.participants.forEach((participant) => {
-          if (participant !== transaction.payer) {
-            newBalances[participant] -= equalSplit;
-            newBalances[transaction.payer] += equalSplit;
+      if (splitMode === 'equal') {
+        const split = amount / participants.length;
+        participants.forEach((person) => {
+          if (person !== payer) {
+            newBalances[person] -= split;
+            newBalances[payer] += split;
           }
         });
-      } else if (transaction.splitMode === 'custom') {
-        Object.entries(transaction.customSplits).forEach(([participant, percentage]) => {
-          const splitAmount = (totalAmount * percentage) / 100;
-          if (participant !== transaction.payer) {
-            newBalances[participant] -= splitAmount;
-            newBalances[transaction.payer] += splitAmount;
-          }
-        });
-      }
-    });
-
-    setBalances(newBalances);
-  }, [transactions]);
-
-  // Calculate balances function for display
-  const calculateBalances = () => {
-    const newBalances = {
-      Rajneesh: 0,
-      Harsit: 0,
-      Nistha: 0,
-      Ankesh: 0,
-    };
-
-    transactions.forEach((transaction) => {
-      const totalAmount = transaction.amount;
-      if (transaction.splitMode === 'equal') {
-        const equalSplit = totalAmount / transaction.participants.length;
-        transaction.participants.forEach((participant) => {
-          if (participant !== transaction.payer) {
-            newBalances[participant] -= equalSplit;
-            newBalances[transaction.payer] += equalSplit;
-          }
-        });
-      } else if (transaction.splitMode === 'custom') {
-        Object.entries(transaction.customSplits).forEach(([participant, percentage]) => {
-          const splitAmount = (totalAmount * percentage) / 100;
-          if (participant !== transaction.payer) {
-            newBalances[participant] -= splitAmount;
-            newBalances[transaction.payer] += splitAmount;
+      } else if (splitMode === 'custom') {
+        Object.entries(customSplits).forEach(([person, percentage]) => {
+          const splitAmount = (amount * percentage) / 100;
+          if (person !== payer) {
+            newBalances[person] -= splitAmount;
+            newBalances[payer] += splitAmount;
           }
         });
       }
@@ -121,22 +90,45 @@ function App() {
     return newBalances;
   };
 
+  useEffect(() => {
+    setBalances(calculateBalances(transactions));
+  }, [transactions]);
+
+  // Handler to reset balances (optional: implement real logic later)
+  const handleSettleUp = () => {
+    alert('Settle up feature coming soon!');
+  };
+
   return (
     <div className="App">
       <header className="bg-primary text-white text-center py-4">
         <h1>Splitwise Web App</h1>
       </header>
+
       <main className="container mt-4">
-        {/* Passing state and setState to child components */}
         <AddTransaction
           transactions={transactions}
           setTransactions={setTransactions}
           newTransaction={newTransaction}
           setNewTransaction={setNewTransaction}
+          members={members}
         />
-        <TransactionList transactions={transactions} />
-        <BalanceSheet balances={calculateBalances()} />
-        <DetailedBreakdown transactions={transactions} />
+
+        {transactions.length === 0 ? (
+          <p className="text-center text-muted">No transactions yet. Add one to get started!</p>
+        ) : (
+          <>
+            <TransactionList transactions={transactions} />
+            <BalanceSheet balances={balances} />
+            <DetailedBreakdown transactions={transactions} />
+          </>
+        )}
+
+        <div className="text-center mt-4">
+          <button className="btn btn-warning" onClick={handleSettleUp}>
+            Settle Up
+          </button>
+        </div>
       </main>
     </div>
   );
